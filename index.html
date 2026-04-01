@@ -3,106 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iran War Monitor - Táctico</title>
+    <title>War Tracker 2026 - Marcelo</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <style>
-        body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
-        .header { background: #1a1a1a; padding: 15px; border-bottom: 2px solid #ff0000; text-align: center; }
-        .alert-banner { background: #ff0000; color: white; padding: 5px; font-weight: bold; text-align: center; font-size: 12px; animation: blink 1.5s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        
-        .main-container { padding: 15px; }
-        .card { background: #161616; border: 1px solid #333; border-radius: 8px; margin-bottom: 15px; padding: 15px; }
-        .card-title { color: #ff4444; font-size: 14px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 5px; }
-        
-        /* Simulación de Mapa Táctico */
-        .map-box { height: 200px; background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Middle_East_map.svg/800px-Middle_East_map.svg.png'); background-size: cover; background-position: center; border-radius: 4px; position: relative; border: 1px solid #444; }
-        .map-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 0, 0, 0.1); pointer-events: none; }
-
-        .news-item { margin-bottom: 12px; border-left: 2px solid #ff4444; padding-left: 10px; }
-        .news-time { font-size: 10px; color: #888; display: block; }
-        
-        /* Sección Chat Estilo Militar */
-        #chat-box { height: 180px; overflow-y: auto; background: #000; padding: 10px; border-radius: 4px; font-size: 13px; border: 1px solid #222; }
-        .input-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-        input { background: #1a1a1a; border: 1px solid #444; color: white; padding: 10px; border-radius: 4px; }
-        button { background: #ff0000; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <div id="root"></div>
 
-    <div class="alert-banner">ALERTA MÁXIMA: ACTIVIDAD DE DEFENSA AÉREA DETECTADA</div>
-    
-    <div class="header">
-        <h1 style="margin:0; font-size: 20px; color: #ff4444;">IRAN WAR MONITOR</h1>
-        <span style="font-size: 10px; color: #888;">SISTEMA DE INTELIGENCIA CIVIL v2.0</span>
-    </div>
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
 
-    <div class="main-container">
-        
-        <div class="card">
-            <div class="card-title">Mapa de Operaciones en Vivo</div>
-            <div class="map-box"><div class="map-overlay"></div></div>
-        </div>
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('map');
+            const [chatInput, setChatInput] = useState('');
+            const [messages, setMessages] = useState([]);
+            const scrollRef = useRef(null);
 
-        <div class="card">
-            <div class="card-title">Últimos Eventos (Feed)</div>
-            <div class="news-item">
-                <span class="news-time">Hace 4 min</span>
-                Explosiones reportadas cerca de instalaciones militares.
-            </div>
-            <div class="news-item">
-                <span class="news-time">Hace 12 min</span>
-                Cierre de espacio aéreo en múltiples regiones.
-            </div>
-        </div>
+            // Configuración Firebase (Tuya)
+            const firebaseConfig = {
+                apiKey: "AIzaSyA6NnsnNSzVhu-w-8NLATu6w1f5rcVoQtY",
+                authDomain: "iran-war-monitor.firebaseapp.com",
+                projectId: "iran-war-monitor",
+                storageBucket: "iran-war-monitor.firebasestorage.app",
+                messagingSenderId: "910450759159",
+                appId: "1:910450759159:web:ac93f92f28e79df945caf2"
+            };
 
-        <div class="card" id="chat-section">
-            <div class="card-title">Reportes de Comunidad</div>
-            <div id="chat-box"></div>
-            <div class="input-group">
-                <input type="text" id="user" placeholder="Tu indicativo (Nombre)">
-                <input type="text" id="msg" placeholder="Escribir reporte...">
-                <button onclick="enviar()">ENVIAR A CENTRAL</button>
-            </div>
-        </div>
+            useEffect(() => {
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                const db = firebase.firestore();
+                
+                const unsubscribe = db.collection("mensajes").orderBy("fecha", "asc")
+                    .onSnapshot((snapshot) => {
+                        const msgs = snapshot.docs.map(doc => doc.data());
+                        setMessages(msgs);
+                    });
+                return () => unsubscribe();
+            }, []);
 
-    </div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyA6NnsnNSzVhu-w-8NLATu6w1f5rcVoQtY",
-            authDomain: "iran-war-monitor.firebaseapp.com",
-            projectId: "iran-war-monitor",
-            storageBucket: "iran-war-monitor.firebasestorage.app",
-            messagingSenderId: "910450759159",
-            appId: "1:910450759159:web:ac93f92f28e79df945caf2"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        function enviar() {
-            const user = document.getElementById('user').value || "USER_REDACTED";
-            const msg = document.getElementById('msg').value;
-            if(msg) {
+            const enviarMensaje = (e) => {
+                e.preventDefault();
+                if (!chatInput.trim()) return;
+                const db = firebase.firestore();
                 db.collection("mensajes").add({
-                    usuario: user,
-                    texto: msg,
+                    usuario: "Marcelo",
+                    texto: chatInput,
                     fecha: new Date()
                 });
-                document.getElementById('msg').value = '';
-            }
-        }
+                setChatInput('');
+            };
 
-        db.collection("mensajes").orderBy("fecha", "asc").onSnapshot((querySnapshot) => {
-            const chatBox = document.getElementById('chat-box');
-            chatBox.innerHTML = "";
-            querySnapshot.forEach((doc) => {
-                chatBox.innerHTML += `<div style="margin-bottom:8px;"><span style="color:#ff4444;">[${doc.data().usuario}]:</span> ${doc.data().texto}</div>`;
-            });
-            chatBox.scrollTop = chatBox.scrollHeight;
-        });
+            return (
+                <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
+                    {/* Header Estilo War Tracker */}
+                    <div className="bg-slate-900 border-b border-red-900/30 p-4 sticky top-0 z-40">
+                        <div className="flex justify-between items-center max-w-4xl mx-auto">
+                            <div>
+                                <h1 className="text-xl font-black uppercase italic">War <span className="text-red-600">Tracker</span> 2026</h1>
+                                <p className="text-[10px] text-slate-500">DEFCON 2 | MARZO 2026</p>
+                            </div>
+                            <div className="text-red-500 animate-pulse text-xs font-bold">● LIVE</div>
+                        </div>
+                    </div>
+
+                    <main className="p-4 max-w-4xl mx-auto">
+                        {activeTab === 'map' && (
+                            <div className="bg-slate-900 rounded-xl border border-slate-800 p-4 h-[350px] relative overflow-hidden">
+                                <div className="absolute top-2 left-2 z-10 bg-black/70 p-2 rounded text-[10px] text-red-400 border border-red-900/50">
+                                    <strong>ZONAS ROJAS:</strong><br/>• Teherán<br/>• Tabriz<br/>• Bandar Abbas
+                                </div>
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Middle_East_map.svg/800px-Middle_East_map.svg.png" className="w-full h-full object-cover opacity-30" />
+                                <div className="absolute top-1/2 left-1/2 w-8 h-8 bg-red-600/20 border border-red-600 rounded-full animate-ping"></div>
+                            </div>
+                        )}
+
+                        {activeTab === 'chat' && (
+                            <div className="flex flex-col h-[500px] bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
+                                <div className="p-3 bg-slate-800 text-xs font-bold">ANALISTA DE INTELIGENCIA MILITAR</div>
+                                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                                    {messages.map((m, i) => (
+                                        <div key={i} className="text-sm">
+                                            <span className="text-red-500 font-bold">[{m.usuario}]:</span> {m.texto}
+                                        </div>
+                                    ))}
+                                </div>
+                                <form onSubmit={enviarMensaje} className="p-3 bg-slate-800 flex gap-2">
+                                    <input value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Escribir reporte..." className="flex-1 bg-black border border-slate-600 p-2 rounded text-sm outline-none" />
+                                    <button className="bg-red-600 px-4 py-2 rounded font-bold">ENVIAR</button>
+                                </form>
+                            </div>
+                        )}
+                        
+                        {/* Secciones de Bajas e Intel (Resumidas para que funcione rápido) */}
+                        {activeTab === 'stats' && (
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="bg-slate-900 p-4 rounded-xl border border-red-900">
+                                    <p className="text-red-500 text-xs font-bold">BAJAS IRÁN</p>
+                                    <p className="text-3xl font-black">6,180</p>
+                                </div>
+                                <div className="bg-slate-900 p-4 rounded-xl border border-blue-900">
+                                    <p className="text-blue-500 text-xs font-bold">BAJAS COALICIÓN</p>
+                                    <p className="text-3xl font-black">30</p>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+
+                    {/* Barra de Navegación Inferior */}
+                    <nav className="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 p-2 flex justify-around">
+                        <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center text-[10px] ${activeTab==='map' ? 'text-red-500':'text-slate-500'}`}>
+                            <i className="fa-solid fa-map"></i><span>MAPA</span>
+                        </button>
+                        <button onClick={() => setActiveTab('stats')} className={`flex flex-col items-center text-[10px] ${activeTab==='stats' ? 'text-red-500':'text-slate-500'}`}>
+                            <i className="fa-solid fa-chart-simple"></i><span>BAJAS</span>
+                        </button>
+                        <button onClick={() => setActiveTab('chat')} className={`flex flex-col items-center text-[10px] ${activeTab==='chat' ? 'text-red-500':'text-slate-500'}`}>
+                            <i className="fa-solid fa-message"></i><span>ANALISTA</span>
+                        </button>
+                    </nav>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
