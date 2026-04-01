@@ -3,130 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>War Tracker 2026 - Marcelo</title>
+    <title>War Tracker 2026 - Live</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body>
+<body class="bg-slate-950">
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
+        // Importamos los iconos que usa tu código
+        const { 
+            Map: MapIcon, Newspaper, BarChart3, History: HistoryIcon, Users, 
+            ShieldAlert, Target, Anchor, MessageCircle, Send, Zap, AlertTriangle 
+        } = lucide;
 
         const App = () => {
-            const [activeTab, setActiveTab] = useState('map');
-            const [chatInput, setChatInput] = useState('');
-            const [messages, setMessages] = useState([]);
-            const scrollRef = useRef(null);
+            const [activeTab, setActiveTab] = React.useState('map');
+            const lastUpdate = new Date().toLocaleTimeString();
 
-            // Configuración Firebase (Tuya)
-            const firebaseConfig = {
-                apiKey: "AIzaSyA6NnsnNSzVhu-w-8NLATu6w1f5rcVoQtY",
-                authDomain: "iran-war-monitor.firebaseapp.com",
-                projectId: "iran-war-monitor",
-                storageBucket: "iran-war-monitor.firebasestorage.app",
-                messagingSenderId: "910450759159",
-                appId: "1:910450759159:web:ac93f92f28e79df945caf2"
-            };
-
-            useEffect(() => {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                const db = firebase.firestore();
-                
-                const unsubscribe = db.collection("mensajes").orderBy("fecha", "asc")
-                    .onSnapshot((snapshot) => {
-                        const msgs = snapshot.docs.map(doc => doc.data());
-                        setMessages(msgs);
-                    });
-                return () => unsubscribe();
-            }, []);
-
-            const enviarMensaje = (e) => {
-                e.preventDefault();
-                if (!chatInput.trim()) return;
-                const db = firebase.firestore();
-                db.collection("mensajes").add({
-                    usuario: "Marcelo",
-                    texto: chatInput,
-                    fecha: new Date()
-                });
-                setChatInput('');
+            // Los datos exactos de tu app
+            const warData = {
+                stats: {
+                    iran: { soldadosCaidos: 6180, barcosHundidos: 12, avionesPerdidos: 7 },
+                    coalicion: { soldadosCaidos: 30, avionesPerdidos: 3, civilesBajas: 42, barcosDañados: 2 }
+                },
+                news: [
+                    { id: 1, time: "Hace 2h", title: "Ultimátum de Trump", content: "EE.UU. confirma que el 6 de abril es la fecha límite para la desnuclearización total." },
+                    { id: 2, time: "Hace 5h", title: "Ataque en Tabriz", content: "Bombardeo masivo a plantas petroquímicas." }
+                ]
             };
 
             return (
-                <div className="min-h-screen bg-slate-950 text-slate-100 pb-20">
-                    {/* Header Estilo War Tracker */}
+                <div className="min-h-screen bg-slate-950 text-slate-100 font-sans pb-20">
+                    {/* Header Original */}
                     <div className="bg-slate-900 border-b border-red-900/30 p-4 sticky top-0 z-40">
-                        <div className="flex justify-between items-center max-w-4xl mx-auto">
+                        <div className="max-w-4xl mx-auto flex justify-between items-center">
                             <div>
-                                <h1 className="text-xl font-black uppercase italic">War <span className="text-red-600">Tracker</span> 2026</h1>
-                                <p className="text-[10px] text-slate-500">DEFCON 2 | MARZO 2026</p>
+                                <h1 className="text-2xl font-black uppercase tracking-tighter italic">
+                                    War <span className="text-red-600">Tracker</span> 2026
+                                </h1>
+                                <p className="text-[10px] text-slate-500 font-mono uppercase">Estado: Operación Furia Épica | DEFCON 2</p>
                             </div>
-                            <div className="text-red-500 animate-pulse text-xs font-bold">● LIVE</div>
+                            <div className="text-red-500 font-bold text-xs animate-pulse flex items-center gap-1">
+                                <span className="block w-2 h-2 bg-red-600 rounded-full"></span> LIVE
+                            </div>
                         </div>
                     </div>
 
-                    <main className="p-4 max-w-4xl mx-auto">
+                    <main className="max-w-4xl mx-auto p-4">
                         {activeTab === 'map' && (
-                            <div className="bg-slate-900 rounded-xl border border-slate-800 p-4 h-[350px] relative overflow-hidden">
-                                <div className="absolute top-2 left-2 z-10 bg-black/70 p-2 rounded text-[10px] text-red-400 border border-red-900/50">
-                                    <strong>ZONAS ROJAS:</strong><br/>• Teherán<br/>• Tabriz<br/>• Bandar Abbas
+                            <div className="space-y-4">
+                                <div className="bg-slate-900 rounded-xl border border-slate-800 p-4 relative h-[400px] overflow-hidden flex items-center justify-center">
+                                    <div className="absolute top-4 left-4 z-10 bg-black/60 p-2 rounded text-[10px] border border-slate-700">
+                                        <p className="font-bold text-red-500">ZONAS ROJAS:</p>
+                                        <p>• Teherán (Nuclear)</p>
+                                        <p>• Tabriz (Refinerías)</p>
+                                        <p>• Bandar Abbas (Puerto)</p>
+                                    </div>
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Middle_East_map.svg/800px-Middle_East_map.svg.png" className="opacity-20 absolute w-full h-full object-cover" />
+                                    <div className="relative text-red-600 font-black text-center">
+                                        [ MAPA TÁCTICO ACTIVO ]
+                                        <div className="w-20 h-20 border-2 border-red-600 rounded-full absolute -top-6 -left-6 animate-ping opacity-20"></div>
+                                    </div>
                                 </div>
-                                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Middle_East_map.svg/800px-Middle_East_map.svg.png" className="w-full h-full object-cover opacity-30" />
-                                <div className="absolute top-1/2 left-1/2 w-8 h-8 bg-red-600/20 border border-red-600 rounded-full animate-ping"></div>
+                                <div className="bg-red-950/20 border border-red-900/50 p-4 rounded-xl flex items-start gap-3">
+                                    <p className="text-xs text-red-200"><span className="font-bold">ALERTA:</span> El Estrecho de Ormuz permanece bajo bloqueo total.</p>
+                                </div>
                             </div>
                         )}
 
-                        {activeTab === 'chat' && (
-                            <div className="flex flex-col h-[500px] bg-slate-900 rounded-xl border border-slate-800 overflow-hidden">
-                                <div className="p-3 bg-slate-800 text-xs font-bold">ANALISTA DE INTELIGENCIA MILITAR</div>
-                                <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                                    {messages.map((m, i) => (
-                                        <div key={i} className="text-sm">
-                                            <span className="text-red-500 font-bold">[{m.usuario}]:</span> {m.texto}
-                                        </div>
-                                    ))}
-                                </div>
-                                <form onSubmit={enviarMensaje} className="p-3 bg-slate-800 flex gap-2">
-                                    <input value={chatInput} onChange={e => setChatInput(e.target.value)} placeholder="Escribir reporte..." className="flex-1 bg-black border border-slate-600 p-2 rounded text-sm outline-none" />
-                                    <button className="bg-red-600 px-4 py-2 rounded font-bold">ENVIAR</button>
-                                </form>
-                            </div>
-                        )}
-                        
-                        {/* Secciones de Bajas e Intel (Resumidas para que funcione rápido) */}
                         {activeTab === 'stats' && (
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-slate-900 p-4 rounded-xl border border-red-900">
-                                    <p className="text-red-500 text-xs font-bold">BAJAS IRÁN</p>
-                                    <p className="text-3xl font-black">6,180</p>
-                                </div>
-                                <div className="bg-slate-900 p-4 rounded-xl border border-blue-900">
-                                    <p className="text-blue-500 text-xs font-bold">BAJAS COALICIÓN</p>
-                                    <p className="text-3xl font-black">30</p>
+                            <div className="grid grid-cols-1 gap-4">
+                                <div className="bg-slate-900 p-6 rounded-2xl border border-red-900/30">
+                                    <h3 className="text-red-500 font-bold mb-4 uppercase">Bajas de Irán</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                                            <p className="text-3xl font-black">{warData.stats.iran.soldadosCaidos.toLocaleString()}</p>
+                                            <p className="text-[10px] text-slate-500 font-bold">SOLDADOS</p>
+                                        </div>
+                                        <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center">
+                                            <p className="text-3xl font-black">{warData.stats.iran.barcosHundidos}</p>
+                                            <p className="text-[10px] text-slate-500 font-bold">BARCOS</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         )}
                     </main>
 
-                    {/* Barra de Navegación Inferior */}
-                    <nav className="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 p-2 flex justify-around">
-                        <button onClick={() => setActiveTab('map')} className={`flex flex-col items-center text-[10px] ${activeTab==='map' ? 'text-red-500':'text-slate-500'}`}>
-                            <i className="fa-solid fa-map"></i><span>MAPA</span>
-                        </button>
-                        <button onClick={() => setActiveTab('stats')} className={`flex flex-col items-center text-[10px] ${activeTab==='stats' ? 'text-red-500':'text-slate-500'}`}>
-                            <i className="fa-solid fa-chart-simple"></i><span>BAJAS</span>
-                        </button>
-                        <button onClick={() => setActiveTab('chat')} className={`flex flex-col items-center text-[10px] ${activeTab==='chat' ? 'text-red-500':'text-slate-500'}`}>
-                            <i className="fa-solid fa-message"></i><span>ANALISTA</span>
-                        </button>
+                    {/* Bottom Nav de tu App */}
+                    <nav className="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 p-2 flex justify-between max-w-4xl mx-auto">
+                        {['map', 'intel', 'stats', 'chat', 'history', 'alliances'].map(t => (
+                            <button key={t} onClick={() => setActiveTab(t)} className={`flex flex-col items-center flex-1 p-2 ${activeTab === t ? 'text-red-500' : 'text-slate-500'}`}>
+                                <span className="text-[9px] font-bold uppercase">{t}</span>
+                            </button>
+                        ))}
                     </nav>
                 </div>
             );
