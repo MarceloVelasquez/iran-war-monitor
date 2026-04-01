@@ -3,48 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iran War Monitor - LIVE</title>
+    <title>Iran War Monitor - Táctico</title>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <style>
-        body { background: #050505; color: #ff3e3e; font-family: 'Courier New', monospace; margin: 0; padding: 10px; }
-        .alert-bar { background: #600; color: white; padding: 10px; text-align: center; font-weight: bold; border: 2px solid red; margin-bottom: 15px; animation: blink 2s infinite; }
-        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
-        .map-container { width: 100%; height: 250px; background: #111; border: 1px solid #333; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; color: #444; }
-        .news-feed { border-left: 3px solid #ff3e3e; padding-left: 15px; margin-bottom: 20px; }
-        .news-item { margin-bottom: 15px; border-bottom: 1px solid #222; padding-bottom: 5px; }
-        .timestamp { color: #888; font-size: 12px; }
-        #chat-section { background: #111; padding: 15px; border-radius: 5px; border: 1px solid #222; }
-        #chat-box { height: 200px; overflow-y: auto; margin-bottom: 10px; font-size: 14px; color: #ddd; }
-        input { background: #000; border: 1px solid #ff3e3e; color: white; padding: 10px; width: calc(100% - 22px); margin-bottom: 5px; }
-        button { background: #ff3e3e; color: black; border: none; padding: 10px; width: 100%; font-weight: bold; cursor: pointer; }
+        body { background-color: #0a0a0a; color: #e0e0e0; font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        .header { background: #1a1a1a; padding: 15px; border-bottom: 2px solid #ff0000; text-align: center; }
+        .alert-banner { background: #ff0000; color: white; padding: 5px; font-weight: bold; text-align: center; font-size: 12px; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        
+        .main-container { padding: 15px; }
+        .card { background: #161616; border: 1px solid #333; border-radius: 8px; margin-bottom: 15px; padding: 15px; }
+        .card-title { color: #ff4444; font-size: 14px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 5px; }
+        
+        /* Simulación de Mapa Táctico */
+        .map-box { height: 200px; background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/Middle_East_map.svg/800px-Middle_East_map.svg.png'); background-size: cover; background-position: center; border-radius: 4px; position: relative; border: 1px solid #444; }
+        .map-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 0, 0, 0.1); pointer-events: none; }
+
+        .news-item { margin-bottom: 12px; border-left: 2px solid #ff4444; padding-left: 10px; }
+        .news-time { font-size: 10px; color: #888; display: block; }
+        
+        /* Sección Chat Estilo Militar */
+        #chat-box { height: 180px; overflow-y: auto; background: #000; padding: 10px; border-radius: 4px; font-size: 13px; border: 1px solid #222; }
+        .input-group { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        input { background: #1a1a1a; border: 1px solid #444; color: white; padding: 10px; border-radius: 4px; }
+        button { background: #ff0000; color: white; border: none; padding: 12px; border-radius: 4px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="alert-bar">⚠️ ESTADO DE ALERTA: MONITOREO EN VIVO ⚠️</div>
-
-    <div class="map-container">
-        <p>[ MAPA TÁCTICO: MEDIO ORIENTE ]</p>
+    <div class="alert-banner">ALERTA MÁXIMA: ACTIVIDAD DE DEFENSA AÉREA DETECTADA</div>
+    
+    <div class="header">
+        <h1 style="margin:0; font-size: 20px; color: #ff4444;">IRAN WAR MONITOR</h1>
+        <span style="font-size: 10px; color: #888;">SISTEMA DE INTELIGENCIA CIVIL v2.0</span>
     </div>
 
-    <div class="news-feed">
-        <div class="news-item">
-            <span class="timestamp">HACE 2 MIN</span>
-            <p><strong>ALERTA:</strong> Movimientos detectados en la frontera norte.</p>
+    <div class="main-container">
+        
+        <div class="card">
+            <div class="card-title">Mapa de Operaciones en Vivo</div>
+            <div class="map-box"><div class="map-overlay"></div></div>
         </div>
-        <div class="news-item">
-            <span class="timestamp">HACE 15 MIN</span>
-            <p><strong>REPORTE:</strong> Sistemas de defensa aérea activados en Teherán.</p>
-        </div>
-    </div>
 
-    <div id="chat-section">
-        <h4 style="margin-top:0">REPORTES DE USUARIOS (CHAT)</h4>
-        <div id="chat-box"></div>
-        <input type="text" id="user" placeholder="Tu indicativo (Nombre)">
-        <input type="text" id="msg" placeholder="Reportar situación...">
-        <button onclick="enviar()">ENVIAR REPORTE</button>
+        <div class="card">
+            <div class="card-title">Últimos Eventos (Feed)</div>
+            <div class="news-item">
+                <span class="news-time">Hace 4 min</span>
+                Explosiones reportadas cerca de instalaciones militares.
+            </div>
+            <div class="news-item">
+                <span class="news-time">Hace 12 min</span>
+                Cierre de espacio aéreo en múltiples regiones.
+            </div>
+        </div>
+
+        <div class="card" id="chat-section">
+            <div class="card-title">Reportes de Comunidad</div>
+            <div id="chat-box"></div>
+            <div class="input-group">
+                <input type="text" id="user" placeholder="Tu indicativo (Nombre)">
+                <input type="text" id="msg" placeholder="Escribir reporte...">
+                <button onclick="enviar()">ENVIAR A CENTRAL</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -60,7 +83,7 @@
         const db = firebase.firestore();
 
         function enviar() {
-            const user = document.getElementById('user').value || "Soldado_Anonimo";
+            const user = document.getElementById('user').value || "USER_REDACTED";
             const msg = document.getElementById('msg').value;
             if(msg) {
                 db.collection("mensajes").add({
@@ -76,7 +99,7 @@
             const chatBox = document.getElementById('chat-box');
             chatBox.innerHTML = "";
             querySnapshot.forEach((doc) => {
-                chatBox.innerHTML += `<p><strong>[${doc.data().usuario}]:</strong> ${doc.data().texto}</p>`;
+                chatBox.innerHTML += `<div style="margin-bottom:8px;"><span style="color:#ff4444;">[${doc.data().usuario}]:</span> ${doc.data().texto}</div>`;
             });
             chatBox.scrollTop = chatBox.scrollHeight;
         });
